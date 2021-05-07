@@ -1,5 +1,7 @@
 {
-    "nersc-help-menu:plugin": {
+    "additional-resources-menu:plugin": {
+        "menu-title": "Additional Resources",
+        "open-in-jupyter": false, 
         "links": [
             {
                 "name": "NERSC Technical Documentation",
