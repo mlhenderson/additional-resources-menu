@@ -12,10 +12,10 @@ A JupyterLab extension.
 
 ## Install
 
-To install the extension, execute:
+To install the extension, enter the root repository folder and execute:
 
 ```bash
-pip install additional_resources_menu
+pip install .
 ```
 
 ## Uninstall
@@ -25,6 +25,19 @@ To remove the extension, execute:
 ```bash
 pip uninstall additional_resources_menu
 ```
+
+If that does not work, you can directly delete the extension folder from Jupyter. See
+<a href="https://jupyterlab.readthedocs.io/en/latest/user/directories.html#extensions">this link</a>
+to find where extensions are installed.
+
+## Configuration
+
+The additional resources menu is populated with links that are specified in the `overrides.json` file. Click 
+<a href="https://jupyterlab.readthedocs.io/en/latest/user/directories.html#overrides-json">this link</a> 
+to see where your overrides.json file is installed. This will set the additional resources for all users who
+access Jupyter through the shared install (so this file must be set for all virtual environments or installs).
+
+View the example_overrides.json file above to see how to format this file
 
 
 ## Contributing
