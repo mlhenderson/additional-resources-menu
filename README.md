@@ -1,11 +1,9 @@
 # additional_resources_menu
 
-![Github Actions Status](https://github.com/github_username/additional_resources_menu/workflows/Build/badge.svg)
-
 A JupyterLab extension.
 
 This extension adds an Additional Resources submenu to the Help Menu in JupyterLab. This submenu provides links to 
-outside documentation as set in the overrides.json file (see Configuration).
+outside documentation as set in the `overrides.json` file (see Configuration).
 
 
 ## Requirements
