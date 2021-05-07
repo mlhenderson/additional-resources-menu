@@ -1,0 +1,22 @@
+{
+    "nersc-help-menu:plugin": {
+        "links": [
+            {
+                "name": "NERSC Technical Documentation",
+                "url": "https://docs.nersc.gov"
+              },
+              {
+                "name": "NERSC Jupyter Documentation",
+                "url": "https://docs.nersc.gov/services/jupyter"
+              },
+              {
+                "name": "JupyterLab Documentation",
+                "url": "https://jupyterlab.readthedocs.io/en/stable/"
+              },
+              {
+                "name": "JupyterHub Documentation",
+                "url": "https://jupyterhub.readthedocs.io/en/stable"
+              }
+        ]
+    }
+}
