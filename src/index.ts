@@ -10,6 +10,7 @@ import { Menu, Widget } from '@lumino/widgets';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 
 // partially from https://github.com/timkpaine/jupyterlab_iframe/blob/main/js/src/index.ts
+// used to open website in a jupyter tab
 let unique = 0;
 class IFrameWidget extends Widget {
   public constructor(title: string, path: string) {
@@ -81,8 +82,9 @@ const extension: JupyterFrontEndPlugin<void> = {
       return;
     }
 
-    const nerscHelpMenu: Menu = new Menu({ commands });
-    nerscHelpMenu.title.label = settings.get('menu-title').composite as string;
+    const additionalResourcesMenu: Menu = new Menu({ commands });
+    additionalResourcesMenu.title.label = settings.get('menu-title')
+      .composite as string;
 
     // Loop through links and add each as a window.open() command
     links.forEach((link: { name: string; url: string }) => {
@@ -121,7 +123,7 @@ const extension: JupyterFrontEndPlugin<void> = {
       });
 
       // add each command to the help menu
-      nerscHelpMenu.addItem({ command });
+      additionalResourcesMenu.addItem({ command });
     });
 
     // Create a tracker for every link
@@ -146,7 +148,7 @@ const extension: JupyterFrontEndPlugin<void> = {
       [
         {
           type: 'submenu' as Menu.ItemType,
-          submenu: nerscHelpMenu
+          submenu: additionalResourcesMenu
         }
       ],
       1
