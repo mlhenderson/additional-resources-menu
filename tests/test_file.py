@@ -9,6 +9,33 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
+# This test file assumes that overrides.json is set to the following information:
+'''
+{
+    "additional-resources-menu:plugin": {
+        "menu-title": "NERSC Resources",
+        "links": [
+            {
+                "name": "NERSC Technical Documentation",
+                "url": "https://docs.nersc.gov"
+              },
+              {
+                "name": "NERSC Jupyter Documentation",
+                "url": "https://docs.nersc.gov/services/jupyter"
+              },
+              {
+                "name": "JupyterLab Documentation",
+                "url": "https://jupyterlab.readthedocs.io/en/stable/"
+              },
+              {
+                "name": "JupyterHub Documentation",
+                "url": "https://jupyterhub.readthedocs.io/en/stable"
+              }
+        ]
+    }
+}
+'''
+
 class TestFile():
   def setup_method(self, method):
     self.driver = webdriver.Firefox()
@@ -26,17 +53,17 @@ class TestFile():
   
   def test_file(self):
     # open JupyerLab and wait for splash screen to go away
-    self.driver.get("http://localhost:8888/lab")
+    self.driver.get("https://jupyter-dev.nersc.gov")
     self.driver.implicitly_wait(10)
 
-    WebDriverWait(self.driver, 20).until(
-      expected_conditions.presence_of_element_located((By.XPATH, '//*[text()="File"]'))
+    # Give 60 seconds for the user to login
+    WebDriverWait(self.driver, 60).until(
+      expected_conditions.presence_of_element_located((By.XPATH, '//div[@class="lm-MenuBar-itemLabel p-MenuBar-itemLabel" and text()="File"]'))
     )
 
     # Wait for splash screen to go away
     time.sleep(3)
 
-    self.driver.set_window_size(1230, 709)
     self.vars["window_handles"] = self.driver.window_handles
     
     # Make sure that Help menu is present, click it
