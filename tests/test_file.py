@@ -8,6 +8,7 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.firefox.options import Options
 
 # This test file assumes that overrides.json is set to the following information:
 '''
@@ -38,7 +39,9 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 class TestFile():
   def setup_method(self, method):
-    self.driver = webdriver.Firefox()
+    options = Options()
+    options.headless = True
+    self.driver = webdriver.Firefox(options=options)
     self.vars = {}
   
   def teardown_method(self, method):
@@ -53,7 +56,7 @@ class TestFile():
   
   def test_file(self):
     # open JupyerLab and wait for splash screen to go away
-    self.driver.get("https://jupyter-dev.nersc.gov")
+    self.driver.get("http://localhost:8888")
     self.driver.implicitly_wait(10)
 
     # Give 60 seconds for the user to login
