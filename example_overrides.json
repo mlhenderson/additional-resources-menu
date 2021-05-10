@@ -1,6 +1,6 @@
 {
     "additional-resources-menu:plugin": {
-        "menu-title": "Additional Resources",
+        "menu-title": "NERSC Resources",
         "open-in-jupyter": false, 
         "links": [
             {
