@@ -15,7 +15,7 @@ outside documentation as set in the `overrides.json` file (see Configuration).
 To install the extension, enter the root repository folder and execute:
 
 ```bash
-pip install .
+pip install additional-resources-menu
 ```
 
 ## Uninstall
@@ -23,7 +23,7 @@ pip install .
 To remove the extension, execute:
 
 ```bash
-pip uninstall additional_resources_menu
+pip uninstall additional-resources-menu
 ```
 
 If that does not work, you can directly delete the extension folder from Jupyter. See
