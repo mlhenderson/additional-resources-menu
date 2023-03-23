@@ -7,9 +7,9 @@
     "jupyterlab",
     "jupyterlab-extension"
   ],
-  "homepage": "https://github.com/github_username/additional_resources_menu",
+  "homepage": "https://github.com/NERSC/additional_resources_menu",
   "bugs": {
-    "url": "https://github.com/github_username/additional_resources_menu/issues"
+    "url": "https://github.com/NERSC/additional_resources_menu/issues"
   },
   "license": "BSD-3-Clause",
   "author": {
