@@ -15,8 +15,7 @@ jobs:
         run: |
           ls ${{ github.workspace }}
 
-      # Install node requirements and then install jupyterlab
-      - run: npm install
+      # Install jupyterlab
       - run: pip install jupyterlab
 
       # Install the extension and show where it was installed
@@ -28,8 +27,8 @@ jobs:
       - run: cp example_overrides.json /home/runner/.local/share/jupyter/lab/settings/overrides.json
 
       # Download and install gecko web driver
-      - run: wget https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz
-      - run: sudo tar -xzf geckodriver-v0.26.0-linux64.tar.gz -C /usr/bin
+      - run: wget https://github.com/mozilla/geckodriver/releases/download/v0.32.2/geckodriver-v0.32.2-linux64.tar.gz
+      - run: sudo tar -xzf geckodriver-v0.32.2-linux64.tar.gz -C /usr/bin
       - run: sudo chmod a+x /usr/bin/geckodriver
 
       # Install selenium and pytest

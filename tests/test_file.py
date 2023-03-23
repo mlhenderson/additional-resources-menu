@@ -40,7 +40,7 @@ from selenium.webdriver.firefox.options import Options
 class TestFile():
   def setup_method(self, method):
     options = Options()
-    options.headless = True
+    options.add_argument("--headless")
     self.driver = webdriver.Firefox(options=options)
     self.vars = {}
   
@@ -61,7 +61,8 @@ class TestFile():
 
     # Give 60 seconds for the user to login
     WebDriverWait(self.driver, 60).until(
-      expected_conditions.presence_of_element_located((By.XPATH, '//div[@class="lm-MenuBar-itemLabel p-MenuBar-itemLabel" and text()="File"]'))
+      expected_conditions.presence_of_element_located(
+        (By.XPATH, '//div[@class="lm-MenuBar-itemLabel p-MenuBar-itemLabel" and text()="File"]'))
     )
 
     # Wait for splash screen to go away
@@ -70,17 +71,20 @@ class TestFile():
     self.vars["window_handles"] = self.driver.window_handles
     
     # Make sure that Help menu is present, click it
-    elem = self.driver.find_element_by_xpath('//div[@class="lm-MenuBar-itemLabel p-MenuBar-itemLabel" and text()="Help"]')
+    elem = self.driver.find_element(
+      By.XPATH, '//div[@class="lm-MenuBar-itemLabel p-MenuBar-itemLabel" and text()="Help"]')
     assert elem is not None
     elem.click()
 
     # Make sure NERSC Resources menu is present, click it
-    elem = self.driver.find_element_by_xpath('//div[@class="lm-Menu-itemLabel p-Menu-itemLabel" and text()="NERSC Resources"]')
+    elem = self.driver.find_element(
+      By.XPATH, '//div[@class="lm-Menu-itemLabel p-Menu-itemLabel" and text()="NERSC Resources"]')
     assert elem is not None
     elem.click()
 
     # Make sure NERSC Technical Documentation option is present, click it
-    elem = self.driver.find_element_by_xpath('//div[@class="lm-Menu-itemLabel p-Menu-itemLabel" and text()="NERSC Technical Documentation"]')
+    elem = self.driver.find_element(
+      By.XPATH, '//div[@class="lm-Menu-itemLabel p-Menu-itemLabel" and text()="NERSC Technical Documentation"]')
     assert elem is not None
 
     # Make sure NERSC Technical Documentation opens to correct website
@@ -94,11 +98,14 @@ class TestFile():
 
     # Go back to JupyterLab and go to NERSC Resources menu
     self.driver.switch_to.window(self.vars["root"])
-    self.driver.find_element_by_xpath('//div[@class="lm-MenuBar-itemLabel p-MenuBar-itemLabel" and text()="Help"]').click()
-    self.driver.find_element_by_xpath('//div[@class="lm-Menu-itemLabel p-Menu-itemLabel" and text()="NERSC Resources"]').click()
+    self.driver.find_element(
+      By.XPATH, '//div[@class="lm-MenuBar-itemLabel p-MenuBar-itemLabel" and text()="Help"]').click()
+    self.driver.find_element(
+      By.XPATH, '//div[@class="lm-Menu-itemLabel p-Menu-itemLabel" and text()="NERSC Resources"]').click()
 
     # Make sure JupyterHub Documentation option is present, click it
-    elem = self.driver.find_element_by_xpath('//div[@class="lm-Menu-itemLabel p-Menu-itemLabel" and text()="JupyterHub Documentation"]')
+    elem = self.driver.find_element(
+      By.XPATH, '//div[@class="lm-Menu-itemLabel p-Menu-itemLabel" and text()="JupyterHub Documentation"]')
     assert elem is not None
     self.vars["window_handles"] = self.driver.window_handles
     elem.click()
