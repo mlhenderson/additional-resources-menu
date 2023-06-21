@@ -16,7 +16,7 @@ jobs:
           ls ${{ github.workspace }}
 
       # Install jupyterlab
-      - run: pip install jupyterlab
+      - run: python -m pip install "jupyterlab>=4.0.0,<5"
 
       # Install the extension and show where it was installed
       - run: pip install .
