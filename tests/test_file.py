@@ -33,9 +33,11 @@ _defaults = {
         }
     }
 
+
 class LinkMovement(enum.Enum):
     UP = enum.auto()
     DOWN = enum.auto()
+
 
 class TestAdditionalResourcesMenu():
     help_menu_xpath = '//div[@class="lm-MenuBar-itemLabel" and text()="Help"]'
@@ -57,9 +59,10 @@ class TestAdditionalResourcesMenu():
 
         # open JupyerLab and wait for splash screen to go away
         self.driver.get("http://localhost:8888")
-        WebDriverWait(self.driver, 10, 0.25).until(
+        wait = WebDriverWait(self.driver, 10)
+        wait.until(
             expected_conditions.visibility_of_element_located((By.XPATH, self.help_menu_xpath)))
-        WebDriverWait(self.driver, 10, 0.25).until_not(
+        wait.until_not(
             expected_conditions.presence_of_element_located(
                 (By.CSS_SELECTOR, 'div#main-logo')))
 
@@ -81,7 +84,7 @@ class TestAdditionalResourcesMenu():
             if elem is None:
                 return
             wait = WebDriverWait(self.driver, 10, 0.25)
-            elem = wait.until(
+            wait.until(
                 expected_conditions.element_to_be_clickable(
                     (By.CSS_SELECTOR, 'button.jp-RestoreButton'))).click()
             wait.until(
@@ -111,30 +114,39 @@ class TestAdditionalResourcesMenu():
         if self.is_settings_editor_plugin_visible():
             return
 
-        settings_menu = self.driver.find_element(By.XPATH, self.settings_menu_xpath)
-        settings_menu.click()
+        wait = WebDriverWait(self.driver, 10)
+        # self.driver.switch_to.default_content()
+        done = False
+        while not done:
+            try:
+                wait.until(
+                    expected_conditions.element_to_be_clickable(
+                        (By.XPATH, self.settings_menu_xpath))).click()
+                wait.until(
+                    expected_conditions.visibility_of_element_located(
+                        (By.ID, 'jp-mainmenu-settings')))
+                break
+            except TimeoutException as e:
+                pass
         # open the settings menu
-        WebDriverWait(self.driver, 60, 0.1).until(
+        wait.until(
             expected_conditions.element_to_be_clickable(
-                (By.CSS_SELECTOR, 'div#jp-mainmenu-settings')))
-        # select the settings editor
-        WebDriverWait(self.driver, 10, 0.1).until(
-            expected_conditions.element_to_be_clickable(
-                (By.XPATH, self.settings_editor_xpath))
-            ).click()
-        WebDriverWait(self.driver, 10, 0.1).until(
+                (By.XPATH, self.settings_editor_xpath))).click()
+        # make sure settings menu overlay has disappeared to not obscure settings tab
+        wait.until_not(
+            expected_conditions.visibility_of_element_located(
+                (By.ID, 'jp-mainmenu-settings')))
+        wait.until(
             expected_conditions.visibility_of_element_located(
                 (By.CSS_SELECTOR, "div#setting-editor")))
         # select the settings editor menu item for this plugin
-        WebDriverWait(self.driver, 10, 0.1).until(
+        wait.until(
             expected_conditions.element_to_be_clickable(
                 (By.XPATH, self.settings_editor_plugin_xpath))
             ).click()
-        #self.driver.save_screenshot('settings_editor_plugin.png')
-        WebDriverWait(self.driver, 10, 0.1).until(
+        wait.until(
             expected_conditions.visibility_of_element_located(
                 (By.CSS_SELECTOR, r'#jp-SettingsEditor-additional-resources-menu\:plugin')))
-        #self.driver.save_screenshot('settings_editor_plugin_after_wait.png')
 
     def close_settings_editor(self):
         try:
@@ -144,11 +156,9 @@ class TestAdditionalResourcesMenu():
                 .context_click(elem) \
                 .release(elem) \
                 .perform()
-            self.driver.save_screenshot('close_settings.png')
             WebDriverWait(self.driver, 10, 0.1).until(
                 expected_conditions.visibility_of_element_located(
                     (By.XPATH, '//div[@class="lm-Menu-itemLabel" and text()="Close Tab"]'))).click()
-            self.driver.save_screenshot('close_settings_2.png')
         except Exception as e:
             print("Close settings editor: {}".format(e))
 
@@ -156,11 +166,9 @@ class TestAdditionalResourcesMenu():
         self.driver.refresh()
         WebDriverWait(self.driver, 30, 0.25).until(
             expected_conditions.visibility_of_element_located((By.XPATH, self.help_menu_xpath)))
-        #self.driver.save_screenshot('refresh_before_logo.png')
         WebDriverWait(self.driver, 10, 0.25).until_not(
             expected_conditions.presence_of_element_located(
                 (By.CSS_SELECTOR, 'div#main-logo')))
-        #self.driver.save_screenshot('refresh_after_logo.png')
 
     def add_link(self, name=None, url=None):
         self.open_settings_editor()
@@ -266,18 +274,18 @@ class TestAdditionalResourcesMenu():
         self.close_settings_editor()
 
     def get_menu_link_element(self, el):
+        wait = WebDriverWait(self.driver, 30)
         """Given a name, url dict, find and return the appropriate submenu link"""
-        WebDriverWait(self.driver, 30, 0.25).until(
+        wait.until(
             expected_conditions.element_to_be_clickable((By.XPATH, self.help_menu_xpath))).click()
-        self.driver.save_screenshot('menu_link_element.png')
         # Make sure menu-title is present, click it
-        WebDriverWait(self.driver, 30, 0.25).until(
+        wait.until(
             expected_conditions.visibility_of_element_located(
                 (By.XPATH,
                  '//div[@class="lm-Menu-itemLabel" and text()="{}"]'.format(
                      _defaults["additional-resources-menu:plugin"]["menu-title"])))).click()
         # Make sure name option is present, return it
-        elem = WebDriverWait(self.driver, 30, 0.25).until(
+        elem = wait.until(
             expected_conditions.visibility_of_element_located(
                 (By.XPATH, '//div[@class="lm-Menu-itemLabel" and text()="{}"]'.format(el['name']))))
         assert elem is not None
@@ -308,10 +316,8 @@ class TestAdditionalResourcesMenu():
         iframe_xpath = '//iframe[@src="{}"]'.format(el['url'])
         """Verify that a given url from a submenu link is opened in a jupyter tab"""
         elem = WebDriverWait(self.driver, 10).until(
-            expected_conditions.visibility_of_element_located((
-                By.XPATH,
-                iframe_xpath
-                )))
+            expected_conditions.visibility_of_element_located(
+                (By.XPATH, iframe_xpath)))
         assert elem is not None
 
     def test_menu_links(self):
@@ -341,7 +347,7 @@ class TestAdditionalResourcesMenu():
             test_link = {"name": "wikipedia", "url": "https://wikipedia.org"}
             self.add_link(**test_link)
             self.reload_page()
-            submenu_elem = self.get_menu_link_element(test_link)
+            self.get_menu_link_element(test_link)
         except Exception as e:
             self.driver.save_screenshot('Exception_add_link.png')
             raise
@@ -351,12 +357,14 @@ class TestAdditionalResourcesMenu():
         try:
             self.remove_link(0)
             self.reload_page()
+            # test that a different link exists
             submenu_elem = self.get_menu_link_element(_defaults["additional-resources-menu:plugin"]['links'][1])
             assert submenu_elem is not None
+            # test that the removed link is not found
             try:
-                submenu_elem = self.get_menu_link_element(_defaults["additional-resources-menu:plugin"]['links'][0])
+                self.get_menu_link_element(_defaults["additional-resources-menu:plugin"]['links'][0])
             except (NoSuchElementException, TimeoutException) as e:
-                print(e)
+                pass
         except Exception as e:
             self.driver.save_screenshot('Exception_remove_link.png')
             raise
@@ -372,7 +380,7 @@ class TestAdditionalResourcesMenu():
             self.reload_page()
             WebDriverWait(self.driver, 10, 0.25).until(
                 expected_conditions.visibility_of_element_located((By.XPATH, self.help_menu_xpath)))
-            submenu_elem = self.get_menu_link_element(hub_link)
+            self.get_menu_link_element(hub_link)
         except Exception as e:
             self.driver.save_screenshot('Exception_update_link.png')
             raise

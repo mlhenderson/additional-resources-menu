@@ -40,14 +40,14 @@
         },
         "menu-title": {
             "type": "string",
-            "title": "Title of the Help Menu",
-            "description": "This is the name of the Help Menu that is displayed to users",
+            "title": "Title of the Help sub-Menu",
+            "description": "This is the name of the Help sub-Menu that is displayed to users",
             "default": "NERSC Resources"
         },
         "open-in-jupyter": {
             "type": "boolean",
-            "title": "Attempt to Open in Jupyter",
-            "description": "Should documentation try to be opened in a Jupyter tab before opening in a browser tab",
+            "title": "Open links in Jupyter tabs",
+            "description": "Should links be opened in a Jupyter tab or a browser tab",
             "default": false
         }
     },
