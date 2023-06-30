@@ -24,9 +24,8 @@ jobs:
 
       # Create the overrides.json file and copy the data from example_overrides
 
-      - run: ls -la /home
-      - run: mkdir -p /home/runner/.local/share/jupyter/lab/settings
-      - run: cp example_overrides.json /home/runner/.local/share/jupyter/lab/settings/overrides.json
+      - run: which python
+      - run: node --version
 
       # Download and install gecko web driver
       - run: wget https://github.com/mozilla/geckodriver/releases/download/v0.32.2/geckodriver-v0.32.2-linux64.tar.gz
@@ -40,4 +39,4 @@ jobs:
       # Start jupyterlab and run the tests
       - run: jupyter labextension list
       - run: jupyter lab --port=8888 --NotebookApp.token='' &
-      - run: pytest
+      - run: pytest -s -p no:logging
