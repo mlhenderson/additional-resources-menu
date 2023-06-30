@@ -19,8 +19,11 @@ jobs:
       - run: python -m pip install "jupyterlab>=4.0.0,<5"
 
       # Install the extension and show where it was installed
-      - run: pip install .
-      - run: jupyter labextension list
+      - run: python -m pip install .
+      - run: |
+          jupyter labextension list
+          jupyter labextension list 2>&1 | grep -ie "additional-resources-menu.*OK"
+          python -m jupyterlab.browser_check
 
       # Create the overrides.json file and copy the data from example_overrides
       - run: mkdir /home/runner/.local/share/jupyter/lab/settings
