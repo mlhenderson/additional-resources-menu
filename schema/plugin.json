@@ -3,10 +3,28 @@
     "description": "A help sub-menu with custom links",
     "type": "object",
     "properties": {
+        "menu-title": {
+            "type": "string",
+            "title": "Title of the Help sub-Menu",
+            "description": "This is the name of the Help sub-Menu that is displayed to users",
+            "default": "Additional Resources"
+        },
+        "open-in-jupyter": {
+            "type": "boolean",
+            "title": "Open links in Jupyter tabs",
+            "description": "Should links be opened in a Jupyter tab or a browser tab",
+            "default": false
+        },
+        "rank": {
+            "type": "number",
+            "title": "Ranking",
+            "description": "Placement ranking in the help menu. \nIncreasing this value will lower the placement, and decreasing will raise it. \nA value of 10 will place this submenu at the bottom of the Help menu, -1 will place it at the top.",
+            "default": 10
+        },
         "links": {
             "type": "array",
             "title": "Help Menu links",
-            "description": "What links to display in the help menu\nFormat: { name: string, url: string }\nExample: { name: \"Google\", url: \"google.com\" }\n",
+            "description": "What links to display in the help menu\nFormat: { name: string, url: string }\nExample: { name: \"Google\", url: \"https://google.com\" }\n",
             "items": {
                 "type": "object",
                 "properties": {
@@ -19,36 +37,7 @@
                 },
                 "required": ["name", "url"]
             },
-            "default": [
-                {
-                  "name": "NERSC Technical Documentation",
-                  "url": "https://docs.nersc.gov"
-                },
-                {
-                  "name": "NERSC Jupyter Documentation",
-                  "url": "https://docs.nersc.gov/services/jupyter"
-                },
-                {
-                  "name": "JupyterLab Documentation",
-                  "url": "https://jupyterlab.readthedocs.io/en/stable/"
-                },
-                {
-                  "name": "JupyterHub Documentation",
-                  "url": "https://jupyterhub.readthedocs.io/en/stable"
-                }
-            ]
-        },
-        "menu-title": {
-            "type": "string",
-            "title": "Title of the Help sub-Menu",
-            "description": "This is the name of the Help sub-Menu that is displayed to users",
-            "default": "NERSC Resources"
-        },
-        "open-in-jupyter": {
-            "type": "boolean",
-            "title": "Open links in Jupyter tabs",
-            "description": "Should links be opened in a Jupyter tab or a browser tab",
-            "default": false
+            "default": []
         }
     },
     "additionalProperties": false

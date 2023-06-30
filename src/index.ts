@@ -43,26 +43,42 @@ const extension: JupyterFrontEndPlugin<void> = {
     let links: any[] = [];
     let openInJupyter = false;
     let tabs = 0;
+    let rank = 0;
+
+    if (restorer) {
+      // Try to restore any trackers
+      void restorer.restore(tracker, {
+        command: OPEN_COMMAND,
+        args: widget => ({
+          naame: widget.title.label,
+          url: widget.content.url
+        }),
+        name: () => namespace
+      });
+    }
 
     function loadSetting(setting: ISettingRegistry.ISettings): void {
       links = setting.get('links').composite as any;
-      // parse the settings, filter out any invalid links, translate text
-      links = links
-        .filter(element => {
-          try {
-            URLExt.parse(element.url);
-          } catch (e) {
-            console.error(`Error parsing URL: ${element.url}`);
-            return false;
-          }
-          return true;
-        })
-        .map(element => {
-          return { name: trans.__(element.name), url: element.url };
-        });
+      if (links) {
+        // parse the settings, filter out any invalid links, translate text
+        links = links
+          .filter(element => {
+            try {
+              URLExt.parse(element.url);
+            } catch (e) {
+              console.error(`Error parsing URL: ${element.url}`);
+              return false;
+            }
+            return true;
+          })
+          .map(element => {
+            return { name: trans.__(element.name), url: element.url };
+          });
+      }
       additionalResourcesMenu.title.label = setting.get('menu-title')
         .composite as string;
       openInJupyter = setting.get('open-in-jupyter').composite as boolean;
+      rank = setting.get('rank').composite as number;
     }
 
     function newHelpResourceWidget(
@@ -118,18 +134,6 @@ const extension: JupyterFrontEndPlugin<void> = {
             });
           });
 
-          if (restorer) {
-            // Try to restore any trackers
-            void restorer.restore(tracker, {
-              command: OPEN_COMMAND,
-              args: widget => ({
-                url: widget.content.url,
-                name: widget.content.title.label
-              }),
-              name: widget => widget.content.url
-            });
-          }
-
           // add additional resources menu as a submenu of the help menu
           mainMenu.helpMenu.addGroup(
             [
@@ -138,13 +142,18 @@ const extension: JupyterFrontEndPlugin<void> = {
                 submenu: additionalResourcesMenu
               }
             ],
-            1
+            rank
           );
         }
       })
-      .catch(reason => {
+      .catch(error => {
         console.error(`${PLUGIN_ID} No links are set in overrides.json`);
-        console.error(reason);
+        console.error(error.message);
+        try {
+          console.trace(error);
+        } catch (e) {
+          console.error('trace not available');
+        }
       });
   }
 };
