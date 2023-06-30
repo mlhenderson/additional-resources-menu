@@ -2,13 +2,12 @@
 
 A JupyterLab extension.
 
-This extension adds an Additional Resources submenu to the Help Menu in JupyterLab. This submenu provides links to 
+This extension adds an Additional Resources submenu to the Help Menu in JupyterLab. This submenu provides links to
 outside documentation as set in the `overrides.json` file (see Configuration).
-
 
 ## Requirements
 
-* JupyterLab >= 3.0
+- JupyterLab >= 3.0
 
 ## Install
 
@@ -32,13 +31,12 @@ to find where extensions are installed.
 
 ## Configuration
 
-The additional resources menu is populated with links that are specified in the `overrides.json` file. Click 
-<a href="https://jupyterlab.readthedocs.io/en/latest/user/directories.html#overrides-json">this link</a> 
+The additional resources menu is populated with links that are specified in the `overrides.json` file. Click
+<a href="https://jupyterlab.readthedocs.io/en/latest/user/directories.html#overrides-json">this link</a>
 to see where your overrides.json file is installed. This will set the additional resources for all users who
 access Jupyter through the shared install (so this file must be set for all virtual environments or installs).
 
 View the example_overrides.json file above to see how to format this file
-
 
 ## Contributing
 

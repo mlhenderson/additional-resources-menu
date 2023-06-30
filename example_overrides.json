@@ -1,25 +1,25 @@
 {
-    "additional-resources-menu:plugin": {
-        "menu-title": "NERSC Resources",
-        "open-in-jupyter": false,
-        "rank": 10,
-        "links": [
-            {
-                "name": "NERSC Technical Documentation",
-                "url": "https://docs.nersc.gov"
-              },
-              {
-                "name": "NERSC Jupyter Documentation",
-                "url": "https://docs.nersc.gov/services/jupyter"
-              },
-              {
-                "name": "JupyterLab Documentation",
-                "url": "https://jupyterlab.readthedocs.io/en/stable/"
-              },
-              {
-                "name": "JupyterHub Documentation",
-                "url": "https://jupyterhub.readthedocs.io/en/stable"
-              }
-        ]
-    }
+  "additional-resources-menu:plugin": {
+    "menu-title": "NERSC Resources",
+    "open-in-jupyter": false,
+    "rank": 10,
+    "links": [
+      {
+        "name": "NERSC Technical Documentation",
+        "url": "https://docs.nersc.gov"
+      },
+      {
+        "name": "NERSC Jupyter Documentation",
+        "url": "https://docs.nersc.gov/services/jupyter"
+      },
+      {
+        "name": "JupyterLab Documentation",
+        "url": "https://jupyterlab.readthedocs.io/en/stable/"
+      },
+      {
+        "name": "JupyterHub Documentation",
+        "url": "https://jupyterhub.readthedocs.io/en/stable"
+      }
+    ]
+  }
 }
