@@ -7,7 +7,7 @@ outside documentation as set in the `overrides.json` file (see Configuration).
 
 ## Requirements
 
-- JupyterLab >= 3.0
+- JupyterLab >= 4.0 < 5
 
 ## Install
 
