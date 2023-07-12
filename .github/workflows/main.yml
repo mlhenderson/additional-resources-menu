@@ -5,16 +5,22 @@ on: [ push, workflow_dispatch ]
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
     steps:
       # Get the current repo files and install node
-      - uses: actions/checkout@v3
-      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Base Setup
+        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
 
-      # Install jupyterlab
-      - run: python -m pip install "jupyterlab>=4.0.0,<5"
+      - name: Install JupyterLab
+        run: python -m pip install "jupyterlab>=4.0.0,<5"
 
       # Install the extension and perform a sanity check
-      - run: |
+      - name: Install extension
+        run: |
           set -eux
           python -m pip install .
           jupyter labextension list
@@ -22,21 +28,30 @@ jobs:
           python -m jupyterlab.browser_check
           jupyter --paths
 
-      # Create the overrides.json file and copy the data from example_overrides
-
+      # sanity checks
       - run: which python
       - run: node --version
+      - run: jupyter labextension list
 
       # Download and install gecko web driver
-      - run: wget https://github.com/mozilla/geckodriver/releases/download/v0.32.2/geckodriver-v0.32.2-linux64.tar.gz
-      - run: sudo tar -xzf geckodriver-v0.32.2-linux64.tar.gz -C /usr/bin
-      - run: sudo chmod a+x /usr/bin/geckodriver
+      - name: Download web driver
+        run: wget https://github.com/mozilla/geckodriver/releases/download/v0.32.2/geckodriver-v0.32.2-linux64.tar.gz
+      - name: Untar driver
+        run: sudo tar -xzf geckodriver-v0.32.2-linux64.tar.gz -C /usr/bin
+      - name: Update driver file permissions
+        run: sudo chmod a+x /usr/bin/geckodriver
 
       # Install selenium and pytest
-      - run: python -m pip install selenium
-      - run: python -m pip install pytest
+      - name: Install Selenium
+        run: python -m pip install selenium
+      - name: Install pytest
+        run: python -m pip install pytest
       
       # Start jupyterlab and run the tests
-      - run: jupyter labextension list
-      - run: jupyter lab --port=8888 --NotebookApp.token='' &
-      - run: pytest -s -p no:logging
+      - name: Start JupyterLab
+        run: jupyter lab --port=8888 --NotebookApp.token='' &
+      - name: Run Tests
+        run: pytest -s -p no:logging
+      - name: Debug
+        uses: stateful/vscode-server-action@v1
+        if: failure()
