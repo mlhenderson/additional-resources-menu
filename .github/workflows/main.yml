@@ -5,9 +5,15 @@ on: [ push, workflow_dispatch ]
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
     steps:
       # Get the current repo files and install node
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
       - uses: actions/setup-node@v3
         with:
           node-version: 16
@@ -16,26 +22,41 @@ jobs:
           ls ${{ github.workspace }}
 
       # Install jupyterlab
-      - run: pip install jupyterlab
+      - name: Install JupyterLab
+        run: |
+          python -m pip install "jupyterlab>=3.5.0,<4"
+          jupyter lab --version
+          jupyter --paths
 
       # Install the extension and show where it was installed
-      - run: pip install .
-      - run: jupyter labextension list
+      - name: Install the extension
+        run: |
+          python -m pip install .
+          jupyter labextension list
 
       # Create the overrides.json file and copy the data from example_overrides
-      - run: mkdir /home/runner/.local/share/jupyter/lab/settings
-      - run: cp example_overrides.json /home/runner/.local/share/jupyter/lab/settings/overrides.json
+      - name: Copy overrides
+        run: |
+          mkdir -p /home/runner/.local/etc/jupyter/labconfig
+          cp example_overrides.json /home/runner/.local/etc/jupyter/labconfig/default_setting_overrides.json
 
       # Download and install gecko web driver
-      - run: wget https://github.com/mozilla/geckodriver/releases/download/v0.32.2/geckodriver-v0.32.2-linux64.tar.gz
-      - run: sudo tar -xzf geckodriver-v0.32.2-linux64.tar.gz -C /usr/bin
-      - run: sudo chmod a+x /usr/bin/geckodriver
+      - name: Get web driver
+        run: |
+          wget https://github.com/mozilla/geckodriver/releases/download/v0.32.2/geckodriver-v0.32.2-linux64.tar.gz
+          sudo tar -xzf geckodriver-v0.32.2-linux64.tar.gz -C /usr/bin
+          sudo chmod a+x /usr/bin/geckodriver
 
       # Install selenium and pytest
-      - run: pip install selenium
-      - run: pip install pytest
-      
+      - name: Install Selenium
+        run: python -m pip install selenium
+      - name: Install pytest
+        run: python -m pip install pytest
+
       # Start jupyterlab and run the tests
-      - run: jupyter labextension list
-      - run: jupyter lab --port=8888 --NotebookApp.token='' &
-      - run: pytest
+      - name: Start JupyterLab
+        run: |
+          jupyter labextension list
+          jupyter lab --port=8888 --NotebookApp.token='' &
+      - name: Run tests
+        run: pytest

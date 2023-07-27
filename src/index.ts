@@ -80,7 +80,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     links = settings.get('links').composite as any;
 
     // if we could not load the links from settings return with an error
-    if (links === [] || Object.keys(links).length === 0) {
+    if (!links || Object.keys(links).length === 0) {
       console.error(`${PLUGIN_ID} No links are set in overrides.json`);
       return;
     }
