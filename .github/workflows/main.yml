@@ -8,6 +8,9 @@ jobs:
     permissions:
       actions: read
       contents: read
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
     steps:
       # Get the current repo files and install node
       - name: Checkout
@@ -41,16 +44,24 @@ jobs:
       - name: Update driver file permissions
         run: sudo chmod a+x /usr/bin/geckodriver
 
+      # Create the overrides.json file and copy the data from example_overrides
+      - name: Copy overrides
+        run: |
+          mkdir -p /home/runner/.local/etc/jupyter/labconfig
+          cp example_overrides.json /home/runner/.local/etc/jupyter/labconfig/default_setting_overrides.json
+
       # Install selenium and pytest
       - name: Install Selenium
         run: python -m pip install selenium
       - name: Install pytest
         run: python -m pip install pytest
-      
+
       # Start jupyterlab and run the tests
       - name: Start JupyterLab
-        run: jupyter lab --port=8888 --NotebookApp.token='' &
-      - name: Run Tests
+        run: |
+          jupyter labextension list
+          jupyter lab --port=8888 --NotebookApp.token='' &
+      - name: Run tests
         run: pytest -s -p no:logging
       - name: Debug
         uses: stateful/vscode-server-action@v1
