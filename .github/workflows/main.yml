@@ -38,9 +38,9 @@ jobs:
 
       # Download and install gecko web driver
       - name: Download web driver
-        run: wget https://github.com/mozilla/geckodriver/releases/download/v0.32.2/geckodriver-v0.32.2-linux64.tar.gz
+        run: wget https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz
       - name: Untar driver
-        run: sudo tar -xzf geckodriver-v0.32.2-linux64.tar.gz -C /usr/bin
+        run: sudo tar -xzf geckodriver-v0.33.0-linux64.tar.gz -C /usr/bin
       - name: Update driver file permissions
         run: sudo chmod a+x /usr/bin/geckodriver
 
@@ -60,7 +60,7 @@ jobs:
       - name: Start JupyterLab
         run: |
           jupyter labextension list
-          jupyter lab --port=8888 --NotebookApp.token='' &
+          jupyter lab --port=8888 --NotebookApp.token='' --debug &
       - name: Run tests
         run: pytest -s -p no:logging
       - name: Debug

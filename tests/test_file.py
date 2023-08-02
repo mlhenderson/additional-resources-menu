@@ -52,7 +52,7 @@ class TestAdditionalResourcesMenu():
         self.example_overrides = os.path.abspath(
             os.path.join(test_file_path, '../../example_overrides.json'))
         self.overrides_copy_path = os.path.abspath(
-            os.path.join(sys.executable, '../../share/jupyter/lab/settings/'))
+            os.path.join(sys.executable, '../../etc/jupyter/labconfig/'))
         self._defaults = self._settings_defaults
         self._override_defaults = json.load(open(self.example_overrides, 'r'))
         self.current_settings = deepcopy(self._settings_defaults)
@@ -79,7 +79,7 @@ class TestAdditionalResourcesMenu():
 
     def add_overrides_file(self):
         os.makedirs(self.overrides_copy_path, exist_ok=True)
-        dest = os.path.abspath(os.path.join(self.overrides_copy_path, 'overrides.json'))
+        dest = os.path.abspath(os.path.join(self.overrides_copy_path, 'default_setting_overrides.json'))
         shutil.copyfile(self.example_overrides, dest)
         self._defaults = self._override_defaults
         if self.default_settings:
