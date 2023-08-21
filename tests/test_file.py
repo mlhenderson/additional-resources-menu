@@ -1,13 +1,12 @@
-import datetime
 import enum
 import json
 import os
 import shutil
 import sys
+import time
 from copy import deepcopy
 
 from selenium import webdriver
-from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
@@ -56,9 +55,11 @@ class TestAdditionalResourcesMenu():
         self._defaults = self._settings_defaults
         self._override_defaults = json.load(open(self.example_overrides, 'r'))
         self.current_settings = deepcopy(self._settings_defaults)
+        self.remove_overrides_file()
         # open JupyterLab and wait for splash screen to go away
         self.driver.get('http://localhost:8888')
         self.wait_for_page_load()
+        self.driver.implicitly_wait(1)
 
     def teardown_method(self, method):
         try:
@@ -66,16 +67,16 @@ class TestAdditionalResourcesMenu():
             self.reload_page()
             if not self.default_settings:
                 self.reset_settings()
-            self.driver.implicitly_wait(1)
         except Exception:
             import traceback
             traceback.print_exc()
         finally:
             try:
-                self.driver.close()
+                # this should clean up any temp files/folders and stop the browser
+                self.driver.quit()
+                self.driver.service.stop()
             except Exception:
                 pass
-            self.driver.quit()
 
     def add_overrides_file(self):
         os.makedirs(self.overrides_copy_path, exist_ok=True)
@@ -84,7 +85,7 @@ class TestAdditionalResourcesMenu():
         self._defaults = self._override_defaults
         if self.default_settings:
             self.current_settings = deepcopy(self._override_defaults)
-        self.driver.implicitly_wait(1)
+        time.sleep(5)
 
     def remove_overrides_file(self):
         if os.path.exists(self.overrides_copy_path):
@@ -92,13 +93,12 @@ class TestAdditionalResourcesMenu():
         self._defaults = self._settings_defaults
         if self.default_settings:
             self.current_settings = deepcopy(self._settings_defaults)
-        self.driver.implicitly_wait(1)
+        time.sleep(5)
 
     def reset_settings(self):
         self.open_settings_editor()
         if not self.default_settings:
             try:
-                #    return
                 wait = WebDriverWait(self.driver, 10)
                 restore_button = wait.until(
                     expected_conditions.presence_of_element_located(
@@ -159,25 +159,26 @@ class TestAdditionalResourcesMenu():
                 (By.CSS_SELECTOR, r'#jp-SettingsEditor-additional-resources-menu\:plugin')))
 
     def close_settings_editor(self):
-        elem = self.driver.find_element(By.XPATH, '//div[@class="lm-TabBar-tabLabel" and text()="Settings"]')
-        # right click to get close tab item
-        ActionChains(self.driver) \
-            .context_click(elem) \
-            .release(elem) \
-            .perform()
-        WebDriverWait(self.driver, 10).until(
-            expected_conditions.visibility_of_element_located(
-                (By.XPATH, '//div[@class="lm-Menu-itemLabel" and text()="Close Tab"]'))).click()
+        time.sleep(5)
+        elem = self.driver.find_element(
+            By.XPATH,
+            '//div[@class="lm-TabBar-tabLabel" and text()="Settings"]/following-sibling::div')
+        elem.click()
         # wait for the tab to disappear
-        WebDriverWait(self.driver, 10).until_not(
+        WebDriverWait(self.driver, 30).until_not(
             expected_conditions.presence_of_element_located(
                 (By.XPATH, '//div[@class="lm-TabBar-tabLabel" and text()="Settings"]')))
 
     def wait_for_page_load(self):
-        wait = WebDriverWait(self.driver, 30)
-        wait.until_not(
-            expected_conditions.presence_of_element_located(
-                (By.ID, 'main-logo')))
+        wait = WebDriverWait(self.driver, 60)
+        # now wait for the main logo to appear and disappear
+        try:
+            self.driver.find_element(By.ID, 'main-logo')
+            wait.until_not(
+                expected_conditions.presence_of_element_located(
+                    (By.ID, 'main-logo')))
+        except:
+            pass
         # now make sure that certain elements are visible to indicate the UI is ready
         wait.until(
             expected_conditions.presence_of_element_located(
@@ -187,17 +188,16 @@ class TestAdditionalResourcesMenu():
         wait.until(
             expected_conditions.visibility_of_element_located(
                 (By.ID, 'jp-left-stack')))
+        try:
+            self.driver.find_element(By.ID, 'main-logo')
+            wait.until_not(
+                expected_conditions.presence_of_element_located(
+                    (By.ID, 'main-logo')))
+        except:
+            pass
 
     def reload_page(self):
-        self.driver.quit()
-        self.driver = webdriver.Firefox(options=self.options)
-        self.driver.get('http://localhost:8888')
-
-        wait = WebDriverWait(self.driver, 30)
-        # now wait for the main logo to appear and disappear
-        wait.until(
-            expected_conditions.presence_of_element_located(
-                (By.ID, 'main-logo')))
+        self.driver.refresh()
         self.wait_for_page_load()
 
     def add_link(self, name=None, url=None):
@@ -246,7 +246,7 @@ class TestAdditionalResourcesMenu():
             if b.text == 'Remove':
                 b.click()
                 break
-        WebDriverWait(self.driver, 10).until(
+        WebDriverWait(self.driver, 30).until(
             expected_conditions.presence_of_element_located(
                 (By.CSS_SELECTOR, 'button.jp-RestoreButton')))
         self.current_settings['additional-resources-menu:plugin']['links'].pop(index)
@@ -260,7 +260,16 @@ class TestAdditionalResourcesMenu():
                 By.CSS_SELECTOR,
                 fr'#jp-SettingsEditor-additional-resources-menu\:plugin .array-item'
                 )[index]
+            name = (elem.find_element(
+                By.ID,
+                fr'jp-SettingsEditor-additional-resources-menu\:plugin_links_{index}_name')
+                    .get_attribute('value'))
+            url = (elem.find_element(
+                By.ID,
+                fr'jp-SettingsEditor-additional-resources-menu\:plugin_links_{index}_url')
+                   .get_attribute('value'))
             buttons = elem.find_elements(By.TAG_NAME, 'button')
+
             if direction == LinkMovement.UP:
                 if index == 0:
                     raise Exception('Unable to move first link UP')
@@ -273,13 +282,29 @@ class TestAdditionalResourcesMenu():
                 button_text = 'Move down'
             else:
                 raise Exception('Unknown direction {}'.format(direction))
-            tmp = self.current_settings['additional-resources-menu:plugin']['links'].pop(index)
-            self.current_settings['additional-resources-menu:plugin']['links'].insert(insert_index, tmp)
+
             for b in buttons:
                 if b.text == button_text:
                     b.click()
                     break
-            self.driver.implicitly_wait(1)
+
+            # make sure the values match
+            elem = self.driver.find_elements(
+                By.CSS_SELECTOR,
+                fr'#jp-SettingsEditor-additional-resources-menu\:plugin .array-item'
+                )[insert_index]
+            assert (name == elem.find_element(
+                By.ID,
+                fr'jp-SettingsEditor-additional-resources-menu\:plugin_links_{insert_index}_name')
+                    .get_attribute('value'))
+            assert (url == elem.find_element(
+                By.ID,
+                fr'jp-SettingsEditor-additional-resources-menu\:plugin_links_{insert_index}_url')
+                    .get_attribute('value'))
+
+            tmp = self.current_settings['additional-resources-menu:plugin']['links'].pop(index)
+            self.current_settings['additional-resources-menu:plugin']['links'].insert(insert_index, tmp)
+
             if self.current_settings['additional-resources-menu:plugin']['links'] != \
                     self._defaults['additional-resources-menu:plugin']['links']:
                 self.default_settings = False
@@ -505,14 +530,11 @@ class TestAdditionalResourcesMenu():
                 (By.XPATH, iframe_xpath)))
         # close tab
         elem = self.driver.find_element(
-            By.XPATH, '//div[@class="lm-TabBar-tabLabel" and text()="{}"]'.format(link['name']))
-        # right click to get close tab item
-        ActionChains(self.driver) \
-            .context_click(elem) \
-            .perform()
-        WebDriverWait(self.driver, 10).until(
-            expected_conditions.visibility_of_element_located(
-                (By.XPATH, '//div[@class="lm-Menu-itemLabel" and text()="Close Tab"]'))).click()
+            By.XPATH, '//div[@class="lm-TabBar-tabLabel" and text()="{}"]/following-sibling::div'.format(link['name']))
+        elem.click()
+        WebDriverWait(self.driver, 30).until_not(
+            expected_conditions.presence_of_element_located(
+                (By.XPATH, '//div[@class="lm-TabBar-tabLabel" and text()="{}"]'.format(link['name']))))
 
     def test_open_menu_links(self):
         """For each submenu link, verify that it opens correctly in a browser tab and in a jupyter tab.
@@ -652,6 +674,11 @@ class TestAdditionalResourcesMenu():
             self.reload_page()
             for link in self._defaults['additional-resources-menu:plugin']['links']:
                 self.remove_link(0)
+                self.reload_page()
+                try:
+                    self.find_menu_link_element(link)
+                except TimeoutException as e:
+                    pass
             self.add_link(**self.test_link)
             self.reload_page()
             assert self.find_menu_link_element(self.test_link)
@@ -678,7 +705,6 @@ class TestAdditionalResourcesMenu():
                 'url': self._defaults['additional-resources-menu:plugin']['links'][3]['url']
                 }
             self.update_link(3, name=hub_link['name'])
-            self.driver.implicitly_wait(3)
             self.reload_page()
             assert self.find_menu_link_element(hub_link)
             self.remove_overrides_file()
