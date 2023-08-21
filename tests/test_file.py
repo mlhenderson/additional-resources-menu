@@ -159,7 +159,7 @@ class TestAdditionalResourcesMenu():
                 (By.CSS_SELECTOR, r'#jp-SettingsEditor-additional-resources-menu\:plugin')))
 
     def close_settings_editor(self):
-        time.sleep(5)
+        time.sleep(10)
         elem = self.driver.find_element(
             By.XPATH,
             '//div[@class="lm-TabBar-tabLabel" and text()="Settings"]/following-sibling::div')
