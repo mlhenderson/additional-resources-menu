@@ -452,6 +452,8 @@ class TestAdditionalResourcesMenu():
             expected_conditions.visibility_of_element_located((By.ID, 'jp-mainmenu-help')))
         help_menu_labels = overlay.find_elements(By.CSS_SELECTOR, '.lm-Menu-itemLabel')
         for x in help_menu_labels:
+            print("{} {}".format(
+                x.text, self.current_settings['additional-resources-menu:plugin']['menu-title']))
             if x.text == self.current_settings['additional-resources-menu:plugin']['menu-title']:
                 ar_menu = x
                 break
