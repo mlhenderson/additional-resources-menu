@@ -801,6 +801,9 @@ class TestAdditionalResourcesMenu():
             overrides_title = self._override_defaults['additional-resources-menu:plugin']['menu-title']
             title = 'Menu Title Test'
             labels = self.get_menu_labels()
+            print(default_title)
+            print(overrides_title)
+            print(labels)
             assert default_title in labels
             assert overrides_title not in labels
             assert title not in labels
