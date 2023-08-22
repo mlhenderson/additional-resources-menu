@@ -61,6 +61,11 @@ jobs:
         run: |
           jupyter labextension list
           jupyter lab --port=8888 --NotebookApp.token='' --debug &
+      - name: Start debug SSH session
+        uses: luchihoratiu/debug-via-ssh@main
+        with:
+          NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+          SSH_PASS: ${{ secrets.SSH_PASS }}
       - name: Run tests
         run: pytest -s -p no:logging
       - name: Debug
